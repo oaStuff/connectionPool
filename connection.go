@@ -11,6 +11,7 @@ import (
 
 var (
 	errConnectionUnusable = errors.New("connection is not usable")
+	errTimeout = errors.New("i/o timeout")
 )
 
 //defines a connection to a remote peer
@@ -42,7 +43,7 @@ func (c *Connection) Read(p []byte) (int, error) {
 	}
 
 	if c.readTimeout != 0 {
-		c.conn.SetReadDeadline(time.Now().Add(time.Millisecond * c.readTimeout))
+		c.conn.SetReadDeadline(time.Now().Add(c.readTimeout))
 	}
 
 	n, err := c.conn.Read(p)
@@ -104,12 +105,22 @@ func (c *Connection) SendData(data []byte) error {
 //Read size byte of data and return is to the caller
 func (c *Connection) ReadData(size uint, timeout time.Duration) ([]byte, error) {
 
+	ret := make([]byte, size)
+	done := make(chan bool)
+	var err error
 
-	ret := make([]byte,size)
-	_, err := io.ReadFull(c.buffReader,ret)
+	go func() {
+		_, err = io.ReadFull(c.buffReader, ret)
+		done <- true
+	}()
 
+	select {
+	case <-done:
+		return ret, err
+	case <-time.After(timeout):
+		return nil, errTimeout
+	}
 
-	return ret, err
 }
 
 func (c *Connection) Close()  {
