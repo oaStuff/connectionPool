@@ -40,7 +40,7 @@ func main() {
 	conn.Close()
 }
 ```
-
+#### Explanation:
 ```go
 pool.NewConnectionPool(2,"192.168.56.50:9998",time.Second * 1,time.Second * 1,nil)
 ```
