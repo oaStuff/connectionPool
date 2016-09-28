@@ -108,7 +108,11 @@ func (c *Connection) ReadData(size uint, timeout time.Duration) ([]byte, error) 
 	ret := make([]byte, size)
 	var err error
 
+	tmp := c.readTimeout
+	c.setReadTimeout(timeout)
 	_, err = io.ReadFull(c.buffReader, ret)
+	c.setReadTimeout(tmp)
+
 	return ret, err
 
 }
