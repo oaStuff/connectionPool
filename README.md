@@ -62,7 +62,7 @@ the value specified.
 ```go
 conn.Close()
 ````
-The **close** method should alway be called after using the connection.
+The **close()** method should alway be called after using the connection.
 This ensures that the connection is returned back to the pool.
 you can always do the following to ensure that
 
