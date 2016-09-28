@@ -47,7 +47,10 @@ pool.NewConnectionPool(2,"192.168.56.50:9998",time.Second * 1,time.Second * 1,ni
 The above will create a connection pool with **2** connections to the remote system
 at IP address 192.168.56.50 on port 9998. The pool will try to always keep the 
 2 connections active. There is a background gorountine that ensures that the
-connections are active.`
+connections are active. The first time.Duration value specifies the read timeout
+while the second specified the connection timeout. The last argument expected is
+an interface of type **Notifier**. (Notifier notifies the "listening" object about
+conditions of the pool.)
 
 ```go
 conn, err := cpool.Get(time.Second * 2)
@@ -84,4 +87,4 @@ ret := make([]byte,512)
 conn.Read(ret)
 ````
 Reading of data can also be done using the above method. This will block until
-the size of the slice is read or an error occurs.
+the size of the slice is read or the connection is cloased or an error occurs.
