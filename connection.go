@@ -106,20 +106,10 @@ func (c *Connection) SendData(data []byte) error {
 func (c *Connection) ReadData(size uint, timeout time.Duration) ([]byte, error) {
 
 	ret := make([]byte, size)
-	done := make(chan bool)
 	var err error
 
-	go func() {
-		_, err = io.ReadFull(c.buffReader, ret)
-		done <- true
-	}()
-
-	select {
-	case <-done:
-		return ret, err
-	case <-time.After(timeout):
-		return nil, errTimeout
-	}
+	_, err = io.ReadFull(c.buffReader, ret)
+	return ret, err
 
 }
 
